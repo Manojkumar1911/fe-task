@@ -93,6 +93,11 @@ export function DataTablePagination<TData>({
                 <PaginationLink
                   isActive={table.getState().pagination.pageIndex === 0}
                   onClick={() => table.setPageIndex(0)}
+                  className={
+                    table.getState().pagination.pageIndex === 0
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : ""
+                  }
                 >
                   1
                 </PaginationLink>
@@ -136,15 +141,15 @@ export function DataTablePagination<TData>({
             {table.getPageCount() > 1 &&
               Array.from({ length: Math.min(3, table.getPageCount() - 2) }).map(
                 (_, i) => {
-                  const pageIndex = table.getState().pagination.pageIndex;
+                  const currentPageIndex = table.getState().pagination.pageIndex;
                   let page;
 
-                  if (pageIndex <= 2) {
+                  if (currentPageIndex <= 2) {
                     page = i + 1;
-                  } else if (pageIndex >= table.getPageCount() - 3) {
+                  } else if (currentPageIndex >= table.getPageCount() - 3) {
                     page = table.getPageCount() - 3 + i;
                   } else {
-                    page = pageIndex - 1 + i;
+                    page = currentPageIndex - 1 + i;
                   }
 
                   // Skip if this would duplicate first or last page
@@ -154,8 +159,13 @@ export function DataTablePagination<TData>({
                   return (
                     <PaginationItem key={page}>
                       <PaginationLink
-                        isActive={pageIndex === page}
+                        isActive={currentPageIndex === page}
                         onClick={() => table.setPageIndex(page)}
+                        className={
+                          currentPageIndex === page
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                            : ""
+                        }
                       >
                         {page + 1}
                       </PaginationLink>
@@ -217,6 +227,12 @@ export function DataTablePagination<TData>({
                     table.getPageCount() - 1
                   }
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  className={
+                    table.getState().pagination.pageIndex ===
+                    table.getPageCount() - 1
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : ""
+                  }
                 >
                   {table.getPageCount()}
                 </PaginationLink>

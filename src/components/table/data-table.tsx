@@ -27,10 +27,6 @@ import {
   TableRow,
 } from "../ui/table";
 
-
-
-
-
 // Keep only this single import
 import { useRouter } from "next/navigation";
 
@@ -48,7 +44,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filters?: FilterOption[];
-  getRowProps?: (row: { original: TData }) => React.HTMLAttributes<HTMLTableRowElement>;
+  getRowProps?: (row: any) => any;
 }
 
 export function DataTable<TData, TValue>({
@@ -58,11 +54,8 @@ export function DataTable<TData, TValue>({
   getRowProps,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
@@ -87,8 +80,6 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  const router = useRouter();
-  
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} filters={filters} />
@@ -116,6 +107,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-accent/50 transition-colors"
                   {...(getRowProps ? getRowProps(row) : {})}
                 >
                   {row.getVisibleCells().map((cell) => (

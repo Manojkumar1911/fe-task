@@ -144,32 +144,109 @@ function EditProductModal({ open, onClose, product }: { open: boolean; onClose: 
   });
   if (!open || !product) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <form
-        className="bg-white p-6 rounded shadow w-96 flex flex-col gap-2"
+        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
         onSubmit={handleSubmit((data) => mutation.mutate({ ...data, price: Number(data.price), rating: Number(data.rating) }))}
       >
-        <h2 className="text-lg font-bold mb-2">Edit Product</h2>
-        <input {...register("title")}
-          placeholder="Title" className="border p-2 rounded" />
-        {errors.title && <span className="text-red-500">{errors.title.message}</span>}
-        <input {...register("price", { valueAsNumber: true })}
-          placeholder="Price" type="number" className="border p-2 rounded" />
-        {errors.price && <span className="text-red-500">{errors.price.message}</span>}
-        <input {...register("rating", { valueAsNumber: true })}
-          placeholder="Rating" type="number" step="0.1" className="border p-2 rounded" />
-        {errors.rating && <span className="text-red-500">{errors.rating.message}</span>}
-        <input {...register("brand")}
-          placeholder="Brand" className="border p-2 rounded" />
-        {errors.brand && <span className="text-red-500">{errors.brand.message}</span>}
-        <textarea {...register("description")}
-          placeholder="Description" className="border p-2 rounded" />
-        {errors.description && <span className="text-red-500">{errors.description.message}</span>}
-        <div className="flex gap-2 mt-2">
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={mutation.isPending}>Save</button>
-          <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={onClose}>Cancel</button>
+        <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
+        
+        <div className="relative">
+          <input 
+            {...register("title")} 
+            id="title"
+            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+          />
+          <label 
+            htmlFor="title" 
+            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+          >
+            Title
+          </label>
+          {errors.title && <span className="text-red-500 text-sm mt-1">{errors.title.message}</span>}
         </div>
-        {mutation.isError && <span className="text-red-500">Error updating product.</span>}
+        
+        <div className="relative">
+          <input 
+            {...register("price", { valueAsNumber: true })} 
+            id="price"
+            type="number" 
+            step="0.01"
+            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+          />
+          <label 
+            htmlFor="price" 
+            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+          >
+            Price
+          </label>
+          {errors.price && <span className="text-red-500 text-sm mt-1">{errors.price.message}</span>}
+        </div>
+        
+        <div className="relative">
+          <input 
+            {...register("rating", { valueAsNumber: true })} 
+            id="rating"
+            type="number" 
+            step="0.1" 
+            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+          />
+          <label 
+            htmlFor="rating" 
+            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+          >
+            Rating
+          </label>
+          {errors.rating && <span className="text-red-500 text-sm mt-1">{errors.rating.message}</span>}
+        </div>
+        
+        <div className="relative">
+          <input 
+            {...register("brand")} 
+            id="brand"
+            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+          />
+          <label 
+            htmlFor="brand" 
+            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+          >
+            Brand
+          </label>
+          {errors.brand && <span className="text-red-500 text-sm mt-1">{errors.brand.message}</span>}
+        </div>
+        
+        <div className="relative">
+          <textarea 
+            {...register("description")} 
+            id="description"
+            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]" 
+          />
+          <label 
+            htmlFor="description" 
+            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+          >
+            Description
+          </label>
+          {errors.description && <span className="text-red-500 text-sm mt-1">{errors.description.message}</span>}
+        </div>
+        
+        <div className="flex gap-3 mt-2">
+          <button 
+            type="submit" 
+            className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium" 
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Saving..." : "Save Changes"}
+          </button>
+          <button 
+            type="button" 
+            className="flex-1 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300 transition-colors font-medium" 
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
+        {mutation.isError && <span className="text-red-500 text-sm">Error updating product.</span>}
       </form>
     </div>
   );
@@ -227,6 +304,7 @@ export default function ProductsPage() {
   // Move columns definition here so it can access sorting and setSorting
   const columns: ColumnDef<Product>[] = [
     { accessorKey: "id", header: "ID" },
+    // The title column already has the integrated image
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -238,6 +316,23 @@ export default function ProductsPage() {
           isDesc={sorting?.id === "title" && sorting.desc}
         />
       ),
+      cell: ({ row }) => {
+        const thumbnail = row.original.thumbnail;
+        return (
+          <div className="flex items-center gap-3">
+            {thumbnail && (
+              <div className="relative h-10 w-10 rounded overflow-hidden flex-shrink-0">
+                <img 
+                  src={thumbnail} 
+                  alt={row.original.title} 
+                  className="object-cover h-full w-full"
+                />
+              </div>
+            )}
+            <span>{row.getValue("title")}</span>
+          </div>
+        );
+      },
       enableSorting: true,
     },
     {
@@ -267,6 +362,23 @@ export default function ProductsPage() {
       enableSorting: true,
     },
     { accessorKey: "brand", header: "Brand" },
+    // Add this to your columns array before the title column
+    {
+      accessorKey: "thumbnail",
+      header: "Image",
+      cell: ({ row }) => {
+        const thumbnail = row.original.thumbnail;
+        return thumbnail ? (
+          <div className="relative h-10 w-10 rounded overflow-hidden">
+            <img 
+              src={thumbnail} 
+              alt={row.original.title} 
+              className="object-cover h-full w-full"
+            />
+          </div>
+        ) : null;
+      },
+    },
   ];
 
   const { data, isLoading, error } = useQuery({
@@ -338,9 +450,10 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen h-screen flex flex-col overflow-hidden">
+    // Update the main container in products page
+    <main className="min-h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex-1 overflow-auto p-4 container mx-auto">
+      <div className="flex-1 p-4 container mx-auto max-w-7xl overflow-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Products</h1>
           <button 
@@ -352,14 +465,7 @@ export default function ProductsPage() {
         </div>
         <AddProductModal open={addOpen} onClose={() => setAddOpen(false)} />
         <EditProductModal open={editOpen} onClose={() => setEditOpen(false)} product={editProduct} />
-        <div className="bg-card rounded-lg p-4 mb-6 shadow-sm">
-          <input
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="Search by title or brand..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+        
         {isLoading ? (
           <TableSkeleton columns={columns.length + 1} />
         ) : error ? (
@@ -377,7 +483,6 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-      {/* Remove the custom pagination controls here */}
     </main>
   );
 }

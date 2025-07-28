@@ -10,6 +10,7 @@ interface DataTableColumnHeaderProps<TData, TValue> {
   isDesc?: boolean;
 }
 
+// Update the DataTableColumnHeader component to make sorting indicators more visible
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
@@ -23,7 +24,9 @@ export function DataTableColumnHeader<TData, TValue>({
     }}>
       <span>{title}</span>
       {isSorted && (
-        isDesc ? <ArrowDown className="ml-1 w-3 h-3" /> : <ArrowUp className="ml-1 w-3 h-3" />
+        isDesc ? 
+          <ArrowDown className="ml-1 w-4 h-4 text-primary" /> : 
+          <ArrowUp className="ml-1 w-4 h-4 text-primary" />
       )}
     </div>
   );

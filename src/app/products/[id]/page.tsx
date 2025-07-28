@@ -93,7 +93,7 @@ export default function ProductDetailPage() {
   return (
     <main className="min-h-screen overflow-auto">
       <Navbar />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 pb-16">
         <div className="flex items-center justify-between mb-6">
           <Link 
             href="/products" 
