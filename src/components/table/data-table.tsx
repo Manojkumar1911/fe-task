@@ -27,6 +27,13 @@ import {
   TableRow,
 } from "../ui/table";
 
+
+
+
+
+// Keep only this single import
+import { useRouter } from "next/navigation";
+
 interface FilterOption {
   columnId: string;
   title: string;
@@ -41,12 +48,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filters?: FilterOption[];
+  getRowProps?: (row: { original: TData }) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filters,
+  getRowProps,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -78,6 +87,8 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  const router = useRouter();
+  
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} filters={filters} />
@@ -105,6 +116,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  {...(getRowProps ? getRowProps(row) : {})}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
