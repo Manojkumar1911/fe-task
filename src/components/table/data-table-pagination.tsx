@@ -51,17 +51,16 @@ export function DataTablePagination<TData>({
   };
 
   return (
-    <div className="flex items-center justify-between px-2">
+    <div className="flex items-center justify-between px-4 py-3 bg-background border-t">
       <div className="flex items-center space-x-2">
-        <p className="text-sm font-medium">Rows per page</p>
+        <p className="text-sm font-medium text-foreground">Rows per page</p>
         <Select
-  value={`${table.getState().pagination.pageSize}`}
-  onValueChange={(value) => {
-    table.setPageSize(Number(value));
-    table.setPageIndex(0); // ✅ Reset to first page
-  }}
->
-
+          value={`${table.getState().pagination.pageSize}`}
+          onValueChange={(value) => {
+            table.setPageSize(Number(value));
+            table.setPageIndex(0); // ✅ Reset to first page
+          }}
+        >
           <SelectTrigger className="h-8 w-[70px]">
             <SelectValue placeholder={table.getState().pagination.pageSize} />
           </SelectTrigger>
@@ -76,6 +75,9 @@ export function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-2">
+        <div className="text-sm text-muted-foreground mr-2">
+          Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
+        </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>

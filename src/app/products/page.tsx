@@ -104,32 +104,74 @@ function AddProductModal({ open, onClose }: { open: boolean; onClose: () => void
   });
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <form
-        className="bg-white p-6 rounded shadow w-96 flex flex-col gap-2"
+        className="bg-card border border-border p-6 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
         onSubmit={handleSubmit((data) => mutation.mutate({ ...data, price: Number(data.price), rating: Number(data.rating) }))}
       >
-        <h2 className="text-lg font-bold mb-2">Add Product</h2>
-        <input {...register("title")}
-          placeholder="Title" className="border p-2 rounded" />
-        {errors.title && <span className="text-red-500">{errors.title.message}</span>}
-        <input {...register("price", { valueAsNumber: true })}
-          placeholder="Price" type="number" className="border p-2 rounded" />
-        {errors.price && <span className="text-red-500">{errors.price.message}</span>}
-        <input {...register("rating", { valueAsNumber: true })}
-          placeholder="Rating" type="number" step="0.1" className="border p-2 rounded" />
-        {errors.rating && <span className="text-red-500">{errors.rating.message}</span>}
-        <input {...register("brand")}
-          placeholder="Brand" className="border p-2 rounded" />
-        {errors.brand && <span className="text-red-500">{errors.brand.message}</span>}
-        <textarea {...register("description")}
-          placeholder="Description" className="border p-2 rounded" />
-        {errors.description && <span className="text-red-500">{errors.description.message}</span>}
-        <div className="flex gap-2 mt-2">
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={mutation.isPending}>Add</button>
-          <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={onClose}>Cancel</button>
+        <h2 className="text-xl font-bold text-foreground">Add Product</h2>
+        
+        <div className="space-y-2">
+          <input {...register("title")}
+            placeholder="Title" 
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
+          />
+          {errors.title && <span className="text-destructive text-sm">{errors.title.message}</span>}
         </div>
-        {mutation.isError && <span className="text-red-500">Error adding product.</span>}
+        
+        <div className="space-y-2">
+          <input {...register("price", { valueAsNumber: true })}
+            placeholder="Price" 
+            type="number" 
+            step="0.01"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
+          />
+          {errors.price && <span className="text-destructive text-sm">{errors.price.message}</span>}
+        </div>
+        
+        <div className="space-y-2">
+          <input {...register("rating", { valueAsNumber: true })}
+            placeholder="Rating" 
+            type="number" 
+            step="0.1" 
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
+          />
+          {errors.rating && <span className="text-destructive text-sm">{errors.rating.message}</span>}
+        </div>
+        
+        <div className="space-y-2">
+          <input {...register("brand")}
+            placeholder="Brand" 
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
+          />
+          {errors.brand && <span className="text-destructive text-sm">{errors.brand.message}</span>}
+        </div>
+        
+        <div className="space-y-2">
+          <textarea {...register("description")}
+            placeholder="Description" 
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent min-h-[80px] resize-none" 
+          />
+          {errors.description && <span className="text-destructive text-sm">{errors.description.message}</span>}
+        </div>
+        
+        <div className="flex gap-3 mt-2">
+          <button 
+            type="submit" 
+            className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium" 
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Adding..." : "Add Product"}
+          </button>
+          <button 
+            type="button" 
+            className="flex-1 bg-secondary text-secondary-foreground px-4 py-2 rounded-md hover:bg-secondary/80 transition-colors font-medium" 
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
+        {mutation.isError && <span className="text-destructive text-sm">Error adding product.</span>}
       </form>
     </div>
   );
@@ -169,26 +211,26 @@ function EditProductModal({ open, onClose, product }: { open: boolean; onClose: 
   });
   if (!open || !product) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <form
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
+        className="bg-card border border-border p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
         onSubmit={handleSubmit((data) => mutation.mutate({ ...data, price: Number(data.price), rating: Number(data.rating) }))}
       >
-        <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
+        <h2 className="text-2xl font-bold text-foreground">Edit Product</h2>
         
         <div className="relative">
           <input 
             {...register("title")} 
             id="title"
-            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            className="w-full px-4 py-3 border border-input rounded-md peer pt-6 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
           />
           <label 
             htmlFor="title" 
-            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+            className="absolute text-sm text-muted-foreground duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-primary"
           >
             Title
           </label>
-          {errors.title && <span className="text-red-500 text-sm mt-1">{errors.title.message}</span>}
+          {errors.title && <span className="text-destructive text-sm mt-1">{errors.title.message}</span>}
         </div>
         
         <div className="relative">
@@ -197,15 +239,15 @@ function EditProductModal({ open, onClose, product }: { open: boolean; onClose: 
             id="price"
             type="number" 
             step="0.01"
-            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            className="w-full px-4 py-3 border border-input rounded-md peer pt-6 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
           />
           <label 
             htmlFor="price" 
-            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+            className="absolute text-sm text-muted-foreground duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-primary"
           >
             Price
           </label>
-          {errors.price && <span className="text-red-500 text-sm mt-1">{errors.price.message}</span>}
+          {errors.price && <span className="text-destructive text-sm mt-1">{errors.price.message}</span>}
         </div>
         
         <div className="relative">
@@ -214,64 +256,64 @@ function EditProductModal({ open, onClose, product }: { open: boolean; onClose: 
             id="rating"
             type="number" 
             step="0.1" 
-            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            className="w-full px-4 py-3 border border-input rounded-md peer pt-6 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
           />
           <label 
             htmlFor="rating" 
-            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+            className="absolute text-sm text-muted-foreground duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-primary"
           >
             Rating
           </label>
-          {errors.rating && <span className="text-red-500 text-sm mt-1">{errors.rating.message}</span>}
+          {errors.rating && <span className="text-destructive text-sm mt-1">{errors.rating.message}</span>}
         </div>
         
         <div className="relative">
           <input 
             {...register("brand")} 
             id="brand"
-            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            className="w-full px-4 py-3 border border-input rounded-md peer pt-6 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent" 
           />
           <label 
             htmlFor="brand" 
-            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+            className="absolute text-sm text-muted-foreground duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-primary"
           >
             Brand
           </label>
-          {errors.brand && <span className="text-red-500 text-sm mt-1">{errors.brand.message}</span>}
+          {errors.brand && <span className="text-destructive text-sm mt-1">{errors.brand.message}</span>}
         </div>
         
         <div className="relative">
           <textarea 
             {...register("description")} 
             id="description"
-            className="w-full px-4 py-3 border rounded-md peer pt-6 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]" 
+            className="w-full px-4 py-3 border border-input rounded-md peer pt-6 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent min-h-[100px] resize-none" 
           />
           <label 
             htmlFor="description" 
-            className="absolute text-sm text-gray-500 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+            className="absolute text-sm text-muted-foreground duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-primary"
           >
             Description
           </label>
-          {errors.description && <span className="text-red-500 text-sm mt-1">{errors.description.message}</span>}
+          {errors.description && <span className="text-destructive text-sm mt-1">{errors.description.message}</span>}
         </div>
         
         <div className="flex gap-3 mt-2">
           <button 
             type="submit" 
-            className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium" 
+            className="flex-1 bg-primary text-primary-foreground px-4 py-3 rounded-md hover:bg-primary/90 transition-colors font-medium" 
             disabled={mutation.isPending}
           >
             {mutation.isPending ? "Saving..." : "Save Changes"}
           </button>
           <button 
             type="button" 
-            className="flex-1 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300 transition-colors font-medium" 
+            className="flex-1 bg-secondary text-secondary-foreground px-4 py-3 rounded-md hover:bg-secondary/80 transition-colors font-medium" 
             onClick={onClose}
           >
             Cancel
           </button>
         </div>
-        {mutation.isError && <span className="text-red-500 text-sm">Error updating product.</span>}
+        {mutation.isError && <span className="text-destructive text-sm">Error updating product.</span>}
       </form>
     </div>
   );
@@ -453,13 +495,13 @@ export default function ProductsPage() {
     cell: ({ row }) => (
       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
         <button 
-          className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer" 
+          className="text-primary hover:text-primary/80 font-medium cursor-pointer transition-colors" 
           onClick={() => { setEditProduct(row.original); setEditOpen(true); }}
         >
           Edit
         </button>
         <button 
-          className="text-red-600 hover:text-red-800 font-medium cursor-pointer" 
+          className="text-destructive hover:text-destructive/80 font-medium cursor-pointer transition-colors" 
           onClick={(e) => { 
             e.stopPropagation();
             if (window.confirm(`Are you sure you want to delete ${row.original.title}?`)) {
@@ -488,7 +530,7 @@ export default function ProductsPage() {
           <h1 className="text-2xl font-bold">Products</h1>
           <div className="flex gap-2">
             <button 
-              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors cursor-pointer" 
+              className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md hover:bg-secondary/80 transition-colors cursor-pointer" 
               onClick={() => {
                 localStorage.removeItem('products');
                 window.location.reload();
@@ -510,7 +552,7 @@ export default function ProductsPage() {
         {isLoading ? (
           <TableSkeleton columns={columns.length + 1} />
         ) : error ? (
-          <div className="p-4 text-red-500 bg-red-50 rounded-md">Error loading products.</div>
+          <div className="p-4 text-destructive bg-destructive/10 rounded-md border border-destructive/20">Error loading products.</div>
         ) : (
           <div className="bg-card rounded-lg shadow-sm">
             <DataTable

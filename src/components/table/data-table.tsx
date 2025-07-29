@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} filters={filters} />
-      <div className="rounded-md border">
+      <div className="rounded-md border border-border bg-card">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -147,7 +147,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-muted-foreground"
                 >
                   No results.
                 </TableCell>
@@ -155,13 +155,6 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
-      
-      {/* Debug info */}
-      <div className="text-sm text-gray-500 p-2 bg-gray-50 rounded">
-        Debug: Total rows: {data.length}, Page size: {table.getState().pagination.pageSize}, 
-        Current page: {table.getState().pagination.pageIndex + 1}, 
-        Total pages: {table.getPageCount()}
       </div>
       
       <DataTablePagination table={table} />
