@@ -27,9 +27,6 @@ import {
   TableRow,
 } from "../ui/table";
 
-// Keep only this single import
-import { useRouter } from "next/navigation";
-
 interface FilterOption {
   columnId: string;
   title: string;
@@ -57,6 +54,10 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const table = useReactTable({
     data,
@@ -66,19 +67,42 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: (updater) => {
+      // Handle pagination update properly
+      const oldState = pagination;
+      const newState =
+        typeof updater === "function" ? updater(oldState) : updater;
+  
+      // If page size changes, reset page index to 0
+      if (newState.pageSize !== oldState.pageSize) {
+        setPagination({
+          pageIndex: 0,
+          pageSize: newState.pageSize,
+        });
+      } else {
+        setPagination(newState);
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
+  
 
   return (
     <div className="space-y-4">
@@ -107,7 +131,6 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="cursor-pointer hover:bg-accent/50 transition-colors"
                   {...(getRowProps ? getRowProps(row) : {})}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -133,6 +156,14 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      
+      {/* Debug info */}
+      <div className="text-sm text-gray-500 p-2 bg-gray-50 rounded">
+        Debug: Total rows: {data.length}, Page size: {table.getState().pagination.pageSize}, 
+        Current page: {table.getState().pagination.pageIndex + 1}, 
+        Total pages: {table.getPageCount()}
+      </div>
+      
       <DataTablePagination table={table} />
     </div>
   );

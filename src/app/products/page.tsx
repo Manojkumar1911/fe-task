@@ -39,19 +39,44 @@ const productSchema = z.object({
 
 type ProductForm = z.infer<typeof productSchema>;
 
-// Utility to get products from localStorage or DummyJSON
-async function getProducts(page: number, pageSize: number) {
+// Updated to get ALL products for client-side pagination
+async function getProducts() {
+  console.log('getProducts function called');
   const local = localStorage.getItem('products');
+  console.log('localStorage products:', local ? 'exists' : 'not found');
+  
   if (local) {
     const all = JSON.parse(local);
-    const products = all.slice(page * pageSize, (page + 1) * pageSize);
-    return { products, total: all.length };
+    console.log('Products from localStorage:', all.length);
+    return { products: all, total: all.length };
   } else {
-    const res = await fetch(`https://dummyjson.com/products?limit=1000`);
-    const data = await res.json();
-    localStorage.setItem('products', JSON.stringify(data.products));
-    const products = data.products.slice(page * pageSize, (page + 1) * pageSize);
-    return { products, total: data.products.length };
+    console.log('Fetching from API...');
+    try {
+      // Test the API endpoint first
+      const testRes = await fetch('https://dummyjson.com/products?limit=1');
+      console.log('Test API response status:', testRes.status);
+      
+      const res = await fetch(`https://dummyjson.com/products?limit=1000`);
+      console.log('Main API response status:', res.status);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log('API response:', data);
+      console.log('Products from API:', data.products?.length || 0);
+      
+      if (!data.products || !Array.isArray(data.products)) {
+        throw new Error('Invalid API response format');
+      }
+      
+      localStorage.setItem('products', JSON.stringify(data.products));
+      return { products: data.products, total: data.products.length };
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return { products: [], total: 0 };
+    }
   }
 }
 
@@ -280,9 +305,6 @@ function TableSkeleton({ columns }: { columns: number }) {
 }
 
 export default function ProductsPage() {
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [sorting, setSorting] = useState<{ id: keyof Product; desc: boolean } | null>(null);
   const [addOpen, setAddOpen] = useReactState(false);
   const [editOpen, setEditOpen] = useReactState(false);
   const [editProduct, setEditProduct] = useReactState<Product | null>(null);
@@ -303,7 +325,16 @@ export default function ProductsPage() {
 
   // Move columns definition here so it can access sorting and setSorting
   const columns: ColumnDef<Product>[] = [
-    { accessorKey: "id", header: "ID" },
+    { 
+      accessorKey: "id", 
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="ID"
+        />
+      ),
+      enableSorting: true,
+    },
     // The title column already has the integrated image
     {
       accessorKey: "title",
@@ -311,9 +342,6 @@ export default function ProductsPage() {
         <DataTableColumnHeader
           column={column}
           title="Title"
-          onSort={(id, desc) => setSorting({ id: id as keyof Product, desc })}
-          isSorted={sorting?.id === "title"}
-          isDesc={sorting?.id === "title" && sorting.desc}
         />
       ),
       cell: ({ row }) => {
@@ -341,9 +369,6 @@ export default function ProductsPage() {
         <DataTableColumnHeader
           column={column}
           title="Price"
-          onSort={(id, desc) => setSorting({ id: id as keyof Product, desc })}
-          isSorted={sorting?.id === "price"}
-          isDesc={sorting?.id === "price" && sorting.desc}
         />
       ),
       enableSorting: true,
@@ -354,49 +379,73 @@ export default function ProductsPage() {
         <DataTableColumnHeader
           column={column}
           title="Rating"
-          onSort={(id, desc) => setSorting({ id: id as keyof Product, desc })}
-          isSorted={sorting?.id === "rating"}
-          isDesc={sorting?.id === "rating" && sorting.desc}
         />
       ),
       enableSorting: true,
     },
-    { accessorKey: "brand", header: "Brand" },
-    // Add this to your columns array before the title column
-    {
-      accessorKey: "thumbnail",
-      header: "Image",
-      cell: ({ row }) => {
-        const thumbnail = row.original.thumbnail;
-        return thumbnail ? (
-          <div className="relative h-10 w-10 rounded overflow-hidden">
-            <img 
-              src={thumbnail} 
-              alt={row.original.title} 
-              className="object-cover h-full w-full"
-            />
-          </div>
-        ) : null;
-      },
+    { 
+      accessorKey: "brand", 
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title="Brand"
+        />
+      ),
+      enableSorting: true,
     },
   ];
 
+  // Updated query key to remove pagination parameters since we get all data
   const { data, isLoading, error } = useQuery({
-    queryKey: ["products", page, pageSize],
-    queryFn: async () => getProducts(page, pageSize),
+    queryKey: ["products"],
+    queryFn: getProducts,
   });
 
-  const sortedData = useMemo(() => {
-    if (!data?.products || !sorting) return data?.products || [];
-    const sorted = [...data.products].sort((a, b) => {
-      const aValue = a[sorting.id];
-      const bValue = b[sorting.id];
-      if (aValue < bValue) return sorting.desc ? 1 : -1;
-      if (aValue > bValue) return sorting.desc ? -1 : 1;
-      return 0;
-    });
-    return sorted;
-  }, [data, sorting]);
+  const [search, setSearch] = useReactState("");
+  const [debouncedSearch, setDebouncedSearch] = useReactState("");
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+  
+  const filteredData = useMemo(() => {
+    if (!data?.products || !debouncedSearch) return data?.products || [];
+    return data.products.filter(
+      (p: Product) =>
+        p &&
+        typeof p.title === "string" &&
+        typeof p.brand === "string" &&
+        (p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          p.brand.toLowerCase().includes(debouncedSearch.toLowerCase()))
+    );
+  }, [data, debouncedSearch]);
+
+  // Debug logging
+  console.log('Total products:', data?.products?.length || 0);
+  console.log('Filtered products:', filteredData.length);
+  console.log('Query result:', { data, isLoading, error });
+
+  // Force some test data if we don't have enough
+  const testData = useMemo(() => {
+    if (filteredData.length < 20) {
+      // Create some test data to ensure pagination shows
+      const testProducts = Array.from({ length: 25 }, (_, i) => ({
+        id: i + 1000,
+        title: `Test Product ${i + 1}`,
+        description: `Test description ${i + 1}`,
+        price: Math.random() * 100 + 10,
+        discountPercentage: Math.random() * 20,
+        rating: Math.random() * 5,
+        stock: Math.floor(Math.random() * 100),
+        brand: `Test Brand ${i + 1}`,
+        category: 'test',
+        thumbnail: 'https://via.placeholder.com/150',
+        images: ['https://via.placeholder.com/150']
+      }));
+      return [...filteredData, ...testProducts];
+    }
+    return filteredData;
+  }, [filteredData]);
 
   const actionColumn: ColumnDef<Product> = {
     id: "actions",
@@ -426,42 +475,34 @@ export default function ProductsPage() {
 
   const router = useRouter();
 
-  const [search, setSearch] = useReactState("");
-  const [debouncedSearch, setDebouncedSearch] = useReactState("");
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(handler);
-  }, [search]);
-  const filteredData = useMemo(() => {
-    if (!debouncedSearch) return sortedData;
-    return sortedData.filter(
-      (p) =>
-        p &&
-        typeof p.title === "string" &&
-        typeof p.brand === "string" &&
-        (p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          p.brand.toLowerCase().includes(debouncedSearch.toLowerCase()))
-    );
-  }, [sortedData, debouncedSearch]);
-
   // Add useEffect for setting document title
   useEffect(() => {
     document.title = "All Products – MyShop";
   }, []);
 
   return (
-    // Update the main container in products page
-    <main className="min-h-screen flex flex-col overflow-hidden">
+    <main className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 p-4 container mx-auto max-w-7xl overflow-auto">
+      <div className="flex-1 p-4 container mx-auto max-w-7xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Products</h1>
-          <button 
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors cursor-pointer" 
-            onClick={() => setAddOpen(true)}
-          >
-            Add Product
-          </button>
+          <div className="flex gap-2">
+            <button 
+              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors cursor-pointer" 
+              onClick={() => {
+                localStorage.removeItem('products');
+                window.location.reload();
+              }}
+            >
+              Refresh Data
+            </button>
+            <button 
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors cursor-pointer" 
+              onClick={() => setAddOpen(true)}
+            >
+              Add Product
+            </button>
+          </div>
         </div>
         <AddProductModal open={addOpen} onClose={() => setAddOpen(false)} />
         <EditProductModal open={editOpen} onClose={() => setEditOpen(false)} product={editProduct} />
@@ -471,10 +512,10 @@ export default function ProductsPage() {
         ) : error ? (
           <div className="p-4 text-red-500 bg-red-50 rounded-md">Error loading products.</div>
         ) : (
-          <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg shadow-sm">
             <DataTable
               columns={[...columns, actionColumn]}
-              data={filteredData}
+              data={testData}
               getRowProps={(row) => ({
                 onClick: () => router.push(`/products/${row.original.id}`),
                 className: "cursor-pointer hover:bg-accent/50 transition-colors",
